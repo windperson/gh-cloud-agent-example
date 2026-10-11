@@ -95,14 +95,17 @@ export function parseGamesCsv(content: string): GameCsvRow[] {
         }));
 }
 
+/** Build the standard placeholder description for a category. */
 export function categoryDescription(name: string): string {
     return `Collection of ${name} games available for crowdfunding`;
 }
 
+/** Build the standard placeholder description for a publisher. */
 export function publisherDescription(name: string): string {
     return `${name} is a game publisher seeking funding for exciting new titles`;
 }
 
+/** Append the crowdfunding callout to a game's source description. */
 export function gameDescription(rawDescription: string): string {
     return rawDescription + CROWDFUNDING_BLURB;
 }
