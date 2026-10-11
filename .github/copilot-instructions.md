@@ -41,6 +41,7 @@ This is a crowdfunding platform for games with a developer theme. The applicatio
 
 - Define tables in `db/schema.ts`; manage schema changes with drizzle-kit migrations - see `drizzle.instructions.md`
 - Keep data-access helpers in `src/lib/` with an **injectable `db`** argument so they're testable
+- Use `getRelatedGames(db, id)` for same-category recommendations; it excludes the current game and returns title-ordered results or an empty array.
 - Keep CSV/seed logic as pure functions in `db/transforms.ts`
 - Seed-derived values must be deterministic (no `Math.random`) so static builds are reproducible
 

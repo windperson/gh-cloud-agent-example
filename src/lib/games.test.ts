@@ -6,6 +6,7 @@ import {
     getAllGames,
     getAllGameIds,
     getGameById,
+    getRelatedGames,
 } from './games';
 
 async function seedGames(db: Database, count: number): Promise<void> {
@@ -62,5 +63,43 @@ describe('games data-access helpers', () => {
     it('returns null for a non-existent game', async () => {
         await seedGames(db, 2);
         expect(await getGameById(db, 99999)).toBeNull();
+    });
+
+    describe('getRelatedGames', () => {
+        it('returns other games in the same category ordered by title with their relations', async () => {
+            await seedGames(db, 3);
+            const all = await getAllGames(db);
+            const [otherCategory] = await db.insert(categories)
+                .values({ name: 'Puzzle' })
+                .returning({ id: categories.id });
+            await db.insert(games).values({
+                title: 'Other category game',
+                description: 'Unrelated game',
+                categoryId: otherCategory.id,
+                publisherId: all[0].publisher!.id,
+            });
+
+            const related = await getRelatedGames(db, all[1].id);
+
+            expect(related.map((game) => game.title)).toEqual(['Game 01', 'Game 03']);
+            expect(related).toEqual([all[0], all[2]]);
+        });
+
+        it('returns no related games when the category contains only the given game', async () => {
+            await seedGames(db, 1);
+            const [id] = await getAllGameIds(db);
+
+            expect(await getRelatedGames(db, id)).toEqual([]);
+        });
+
+        it('returns no related games for a non-existent game', async () => {
+            await seedGames(db, 2);
+
+            expect(await getRelatedGames(db, 99999)).toEqual([]);
+        });
+
+        it('returns no related games from an empty database', async () => {
+            expect(await getRelatedGames(db, 1)).toEqual([]);
+        });
     });
 });
