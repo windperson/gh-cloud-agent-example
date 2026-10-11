@@ -3,7 +3,7 @@ import Menu from '../assets/icons/menu.svg';
 ---
 
 <header class="bg-blue-500 dark:bg-blue-700 text-white p-4 shadow-md transition-colors duration-300">
-  <div class="container mx-auto flex justify-between items-center pl-4 pr-4">
+  <div class="container mx-auto flex flex-wrap justify-between items-center gap-2 pl-4 pr-4">
     <div class="flex items-center">
       <div class="relative group">
         <button id="menu-toggle" class="focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-blue-500 rounded mr-4" aria-label="Toggle menu" aria-expanded="false" aria-controls="menu">
@@ -17,6 +17,28 @@ import Menu from '../assets/icons/menu.svg';
         </nav>
       </div>
       <div class="text-xl font-bold"><a href="/" class="hover:underline">Tailspin Toys</a></div>
+    </div>
+    <div class="flex flex-wrap items-center gap-2">
+      <button
+        id="theme-toggle"
+        type="button"
+        class="rounded bg-blue-900 px-3 py-2 text-sm font-medium hover:bg-blue-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yellow-300 focus-visible:ring-offset-2 focus-visible:ring-offset-blue-700"
+        aria-label="Light mode"
+        aria-pressed="false"
+        data-testid="theme-toggle"
+      >
+        Light mode
+      </button>
+      <button
+        id="high-contrast-toggle"
+        type="button"
+        class="rounded bg-blue-900 px-3 py-2 text-sm font-medium hover:bg-blue-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yellow-300 focus-visible:ring-offset-2 focus-visible:ring-offset-blue-700"
+        aria-label="High contrast mode"
+        aria-pressed="false"
+        data-testid="high-contrast-toggle"
+      >
+        High contrast
+      </button>
     </div>
   </div>
 </header>
@@ -53,6 +75,46 @@ import Menu from '../assets/icons/menu.svg';
         menu.classList.add('hidden');
         menuToggle.setAttribute('aria-expanded', 'false');
         menuToggle.focus();
+      }
+    });
+  }
+
+  const themeToggle = document.getElementById('theme-toggle');
+  if (themeToggle) {
+    const isLightMode = document.documentElement.dataset.theme === 'light';
+    themeToggle.setAttribute('aria-pressed', String(isLightMode));
+
+    themeToggle.addEventListener('click', () => {
+      const enableLightMode = document.documentElement.dataset.theme !== 'light';
+      if (enableLightMode) {
+        document.documentElement.dataset.theme = 'light';
+      } else {
+        delete document.documentElement.dataset.theme;
+      }
+      themeToggle.setAttribute('aria-pressed', String(enableLightMode));
+
+      try {
+        localStorage.setItem('theme', enableLightMode ? 'light' : 'dark');
+      } catch {
+        // The current page still updates when browser storage is unavailable.
+      }
+    });
+  }
+
+  const contrastToggle = document.getElementById('high-contrast-toggle');
+  if (contrastToggle) {
+    const isHighContrast = document.documentElement.dataset.highContrast === 'true';
+    contrastToggle.setAttribute('aria-pressed', String(isHighContrast));
+
+    contrastToggle.addEventListener('click', () => {
+      const enableHighContrast = document.documentElement.dataset.highContrast !== 'true';
+      document.documentElement.dataset.highContrast = String(enableHighContrast);
+      contrastToggle.setAttribute('aria-pressed', String(enableHighContrast));
+
+      try {
+        localStorage.setItem('high-contrast', String(enableHighContrast));
+      } catch {
+        // The current page still updates when browser storage is unavailable.
       }
     });
   }

@@ -13,6 +13,53 @@ test.describe('Accessibility Tests', () => {
     expect(accessibilityScanResults.violations).toEqual([]);
   });
 
+  test('high contrast mode can be enabled and persists after reload', async ({ page }) => {
+    await page.goto('/');
+
+    const toggle = page.getByRole('button', { name: 'High contrast mode' });
+    await expect(toggle).toHaveAttribute('aria-pressed', 'false');
+    await toggle.click();
+
+    await expect(toggle).toHaveAttribute('aria-pressed', 'true');
+    await expect(page.locator('html')).toHaveAttribute('data-high-contrast', 'true');
+    await expect.poll(() => page.evaluate(() => localStorage.getItem('high-contrast'))).toBe('true');
+
+    await page.reload();
+    await expect(page.locator('html')).toHaveAttribute('data-high-contrast', 'true');
+    await expect(toggle).toHaveAttribute('aria-pressed', 'true');
+
+    await toggle.click();
+    await expect(toggle).toHaveAttribute('aria-pressed', 'false');
+    await expect.poll(() => page.evaluate(() => localStorage.getItem('high-contrast'))).toBe('false');
+  });
+
+  test('light mode can be enabled with high contrast and persists after reload', async ({ page }) => {
+    await page.goto('/');
+
+    const lightModeToggle = page.getByRole('button', { name: 'Light mode' });
+    const contrastToggle = page.getByRole('button', { name: 'High contrast mode' });
+    await expect(lightModeToggle).toHaveAttribute('aria-pressed', 'false');
+    await lightModeToggle.click();
+
+    await expect(lightModeToggle).toHaveAttribute('aria-pressed', 'true');
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
+    await expect.poll(() => page.evaluate(() => localStorage.getItem('theme'))).toBe('light');
+
+    await contrastToggle.click();
+    await expect(page.locator('html')).toHaveAttribute('data-high-contrast', 'true');
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
+
+    await page.reload();
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
+    await expect(page.locator('html')).toHaveAttribute('data-high-contrast', 'true');
+    await expect(lightModeToggle).toHaveAttribute('aria-pressed', 'true');
+
+    await lightModeToggle.click();
+    await expect(page.locator('html')).not.toHaveAttribute('data-theme', 'light');
+    await expect(page.locator('html')).toHaveAttribute('data-high-contrast', 'true');
+    await expect.poll(() => page.evaluate(() => localStorage.getItem('theme'))).toBe('dark');
+  });
+
   test('game details page should not have accessibility violations', async ({ page }) => {
     await page.goto('/game/1');
     await page.waitForSelector('[data-testid="game-details"]', { timeout: 10000 });
