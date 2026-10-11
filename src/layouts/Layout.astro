@@ -23,6 +23,9 @@ const { title = "Tailspin Toys" } = Astro.props;
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
         <script is:inline>
             try {
+                if (localStorage.getItem('theme') === 'light') {
+                    document.documentElement.dataset.theme = 'light';
+                }
                 if (localStorage.getItem('high-contrast') === 'true') {
                     document.documentElement.dataset.highContrast = 'true';
                 }
