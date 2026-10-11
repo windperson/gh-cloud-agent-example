@@ -18,6 +18,16 @@ import Menu from '../assets/icons/menu.svg';
       </div>
       <div class="text-xl font-bold"><a href="/" class="hover:underline">Tailspin Toys</a></div>
     </div>
+    <button
+      id="high-contrast-toggle"
+      type="button"
+      class="rounded px-3 py-2 text-sm font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-yellow-300 focus-visible:ring-offset-2 focus-visible:ring-offset-blue-700"
+      aria-label="High contrast mode"
+      aria-pressed="false"
+      data-testid="high-contrast-toggle"
+    >
+      High contrast
+    </button>
   </div>
 </header>
 
@@ -53,6 +63,24 @@ import Menu from '../assets/icons/menu.svg';
         menu.classList.add('hidden');
         menuToggle.setAttribute('aria-expanded', 'false');
         menuToggle.focus();
+      }
+    });
+  }
+
+  const contrastToggle = document.getElementById('high-contrast-toggle');
+  if (contrastToggle) {
+    const isHighContrast = document.documentElement.dataset.highContrast === 'true';
+    contrastToggle.setAttribute('aria-pressed', String(isHighContrast));
+
+    contrastToggle.addEventListener('click', () => {
+      const enableHighContrast = document.documentElement.dataset.highContrast !== 'true';
+      document.documentElement.dataset.highContrast = String(enableHighContrast);
+      contrastToggle.setAttribute('aria-pressed', String(enableHighContrast));
+
+      try {
+        localStorage.setItem('high-contrast', String(enableHighContrast));
+      } catch {
+        // The current page still updates when browser storage is unavailable.
       }
     });
   }

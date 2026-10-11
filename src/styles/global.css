@@ -1,1 +1,36 @@
 @import "tailwindcss";
+
+html[data-high-contrast="true"] body {
+    color: #fff !important;
+    background-color: #000 !important;
+}
+
+html[data-high-contrast="true"] body :where(*) {
+    color: #fff !important;
+    background-color: #000 !important;
+    background-image: none !important;
+    border-color: #fff !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+}
+
+html[data-high-contrast="true"] body a {
+    color: #ff0 !important;
+    text-decoration: underline;
+    text-decoration-thickness: 0.12em;
+}
+
+html[data-high-contrast="true"] body button {
+    color: #000 !important;
+    background-color: #fff !important;
+    border: 2px solid #fff !important;
+}
+
+html[data-high-contrast="true"] body button :where(*) {
+    color: #000 !important;
+}
+
+html[data-high-contrast="true"] body :where(a, button, [tabindex]):focus-visible {
+    outline: 3px solid #0ff !important;
+    outline-offset: 3px;
+}

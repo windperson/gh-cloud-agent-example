@@ -21,6 +21,15 @@ const { title = "Tailspin Toys" } = Astro.props;
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+        <script is:inline>
+            try {
+                if (localStorage.getItem('high-contrast') === 'true') {
+                    document.documentElement.dataset.highContrast = 'true';
+                }
+            } catch {
+                // Keep the default theme if browser storage is unavailable.
+            }
+        </script>
     </head>
     <body class="min-h-screen bg-slate-900 text-white transition-colors duration-300 m-0 w-full h-full font-sans">
         <Header />
