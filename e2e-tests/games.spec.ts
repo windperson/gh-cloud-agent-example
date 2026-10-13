@@ -1,6 +1,33 @@
 import { test, expect, type Response } from '@playwright/test';
 
 test.describe('Game Listing and Navigation', () => {
+  test('should show same-category related games and navigate to their details', async ({ page }) => {
+    await page.goto('/');
+    const cards = page.getByTestId('game-card');
+    const currentCard = cards.first();
+    const currentId = await currentCard.getAttribute('data-game-id');
+    const category = await currentCard.getByTestId('game-category').innerText();
+    const sameCategoryCards = cards.filter({
+      has: page.getByTestId('game-category').filter({ hasText: new RegExp(`^${category}$`) }),
+    });
+    const expectedTitles = (await sameCategoryCards.getByTestId('game-title').allTextContents()).slice(1);
+    expect(expectedTitles.length).toBeGreaterThan(0);
+
+    await currentCard.click();
+    const section = page.getByRole('region', { name: 'Related games' });
+    const relatedCards = section.getByTestId('game-card');
+    await expect(section.getByRole('heading', { name: 'Related games' })).toHaveCount(1);
+    await expect(relatedCards.getByTestId('game-title')).toHaveText(expectedTitles);
+    await expect(relatedCards.getByTestId('game-category')).toHaveText(expectedTitles.map(() => category));
+    await expect(section.locator(`[data-game-id="${currentId}"]`)).toHaveCount(0);
+
+    const relatedId = await relatedCards.first().getAttribute('data-game-id');
+    await relatedCards.first().focus();
+    await page.keyboard.press('Enter');
+    await expect(page).toHaveURL(`/game/${relatedId}`);
+    await expect(page.getByTestId('game-details-title')).toHaveText(expectedTitles[0]);
+  });
+
   test('should display games with titles on index page', async ({ page }) => {
     await test.step('Navigate to homepage', async () => {
       await page.goto('/');

@@ -1,4 +1,4 @@
-import { eq, asc } from 'drizzle-orm';
+import { eq, asc, and, ne } from 'drizzle-orm';
 import type { Database } from './db';
 import { games, categories, publishers } from '../../db/schema';
 import type { Game } from '../types/game';
@@ -66,4 +66,17 @@ export async function getAllGameIds(db: Database): Promise<number[]> {
 export async function getGameById(db: Database, id: number): Promise<Game | null> {
     const row = await baseGamesQuery(db).where(eq(games.id, id)).get();
     return row ? mapGame(row) : null;
+}
+
+/** Other games in the same category, ordered by title. */
+export async function getRelatedGames(db: Database, id: number): Promise<Game[]> {
+    const game = await getGameById(db, id);
+    if (!game?.category) {
+        return [];
+    }
+
+    const rows = await baseGamesQuery(db)
+        .where(and(eq(games.categoryId, game.category.id), ne(games.id, id)))
+        .orderBy(asc(games.title));
+    return rows.map(mapGame);
 }
