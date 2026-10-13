@@ -18,7 +18,12 @@ const DEFAULT_DATABASE_URL = 'file:tailspin.db';
 
 let cachedDb: Database | undefined;
 
-/** Resolve a local SQLite URL to the path expected by Node's built-in driver. */
+/**
+ * Resolve a local SQLite URL to the path expected by Node's built-in driver.
+ *
+ * Creates parent directories for file URLs and rejects non-local database
+ * URLs; `:memory:` is passed through unchanged.
+ */
 function databasePath(url: string): string {
     if (url === ':memory:') {
         return url;
@@ -37,7 +42,12 @@ function databasePath(url: string): string {
     return filePath;
 }
 
-/** Bridge Drizzle's async SQLite adapter to Node's synchronous built-in driver. */
+/**
+ * Bridge Drizzle's async SQLite adapter to Node's synchronous built-in driver.
+ *
+ * Query results are returned as column-value arrays in the order selected by
+ * Drizzle, and an absent row from a `get` query is preserved as no result.
+ */
 function createRemoteCallback(sqlite: DatabaseSync): AsyncRemoteCallback {
     return async (sql: string, params: SQLInputValue[], method: 'run' | 'all' | 'values' | 'get') => {
         const statement = sqlite.prepare(sql);
@@ -59,7 +69,12 @@ function createRemoteCallback(sqlite: DatabaseSync): AsyncRemoteCallback {
     };
 }
 
-/** Run generated migration statements atomically through Node's SQLite driver. */
+/**
+ * Run generated migration statements atomically through Node's SQLite driver.
+ *
+ * Rolls back the transaction and rethrows the original error if any statement
+ * fails.
+ */
 export function executeMigrationQueries(sqlite: DatabaseSync, queries: string[]): void {
     sqlite.exec('BEGIN');
     try {

@@ -25,6 +25,11 @@ type GameSelectionRow = {
     publisherName: string | null;
 };
 
+/**
+ * Convert a joined database row to the app-facing game shape.
+ *
+ * Missing joined category or publisher data is represented as `null`.
+ */
 function mapGame(row: GameSelectionRow): Game {
     return {
         id: row.id,
@@ -42,6 +47,7 @@ function mapGame(row: GameSelectionRow): Game {
     };
 }
 
+/** Build the shared game query with optional category and publisher joins. */
 function baseGamesQuery(db: Database) {
     return db
         .select(gameSelection)

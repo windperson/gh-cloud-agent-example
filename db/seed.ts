@@ -16,6 +16,7 @@ import {
 
 const here = dirname(fileURLToPath(import.meta.url));
 
+/** Reuse existing categories by name or insert them, returning their IDs. */
 async function upsertCategories(db: Database, names: string[]): Promise<Map<string, number>> {
     const map = new Map<string, number>();
     for (const name of names) {
@@ -33,6 +34,7 @@ async function upsertCategories(db: Database, names: string[]): Promise<Map<stri
     return map;
 }
 
+/** Reuse existing publishers by name or insert them, returning their IDs. */
 async function upsertPublishers(db: Database, names: string[]): Promise<Map<string, number>> {
     const map = new Map<string, number>();
     for (const name of names) {
